@@ -5,7 +5,7 @@
 # Title: NOAA Weather Radio
 # Author: Brian McLaughlin
 # Description: Tune to one of the 7 US NOAA weather stations.
-# Generated: Wed Jan 20 14:56:40 2016
+# Generated: Wed Jan 20 15:29:07 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -145,6 +145,41 @@ class noaa_weather(gr.top_block, Qt.QWidget):
                 taps=None,
                 fractional_bw=None,
         )
+        self.qtgui_waterfall_sink_x_1 = qtgui.waterfall_sink_f(
+        	1024, #size
+        	firdes.WIN_BLACKMAN_hARRIS, #wintype
+        	0, #fc
+        	16e3, #bw
+        	"", #name
+                1 #number of inputs
+        )
+        self.qtgui_waterfall_sink_x_1.set_update_time(0.10)
+        self.qtgui_waterfall_sink_x_1.enable_grid(False)
+        
+        if not True:
+          self.qtgui_waterfall_sink_x_1.disable_legend()
+        
+        if "float" == "float" or "float" == "msg_float":
+          self.qtgui_waterfall_sink_x_1.set_plot_pos_half(not False)
+        
+        labels = ["", "", "", "", "",
+                  "", "", "", "", ""]
+        colors = [3, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+        for i in xrange(1):
+            if len(labels[i]) == 0:
+                self.qtgui_waterfall_sink_x_1.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_waterfall_sink_x_1.set_line_label(i, labels[i])
+            self.qtgui_waterfall_sink_x_1.set_color_map(i, colors[i])
+            self.qtgui_waterfall_sink_x_1.set_line_alpha(i, alphas[i])
+        
+        self.qtgui_waterfall_sink_x_1.set_intensity_range(-80, -40)
+        
+        self._qtgui_waterfall_sink_x_1_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_1.pyqwidget(), Qt.QWidget)
+        self.notebook_top_grid_layout_1.addWidget(self._qtgui_waterfall_sink_x_1_win, 0,1,1,1)
         self.qtgui_waterfall_sink_x_0 = qtgui.waterfall_sink_c(
         	1024, #size
         	firdes.WIN_BLACKMAN_hARRIS, #wintype
@@ -220,7 +255,7 @@ class noaa_weather(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0_0.set_line_alpha(i, alphas[i])
         
         self._qtgui_freq_sink_x_0_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0_0.pyqwidget(), Qt.QWidget)
-        self.notebook_top_layout_1.addWidget(self._qtgui_freq_sink_x_0_0_win)
+        self.notebook_top_grid_layout_1.addWidget(self._qtgui_freq_sink_x_0_0_win, 0,0,1,1)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
         	1024, #size
         	firdes.WIN_BLACKMAN_hARRIS, #wintype
@@ -280,6 +315,7 @@ class noaa_weather(gr.top_block, Qt.QWidget):
         self.connect((self.analog_nbfm_rx_0, 0), (self.high_pass_filter_0, 0))    
         self.connect((self.high_pass_filter_0, 0), (self.audio_sink_0, 0))    
         self.connect((self.high_pass_filter_0, 0), (self.qtgui_freq_sink_x_0_0, 0))    
+        self.connect((self.high_pass_filter_0, 0), (self.qtgui_waterfall_sink_x_1, 0))    
         self.connect((self.low_pass_filter_0, 0), (self.rational_resampler_xxx_0, 0))    
         self.connect((self.rational_resampler_xxx_0, 0), (self.analog_nbfm_rx_0, 0))    
         self.connect((self.rtlsdr_source_0, 0), (self.low_pass_filter_0, 0))    
@@ -313,8 +349,8 @@ class noaa_weather(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 6e3, 1e3, firdes.WIN_HAMMING, 6.76))
-        self.qtgui_freq_sink_x_0.set_frequency_range(self.chooser_frequency, self.samp_rate)
         self.qtgui_waterfall_sink_x_0.set_frequency_range(0, self.samp_rate)
+        self.qtgui_freq_sink_x_0.set_frequency_range(self.chooser_frequency, self.samp_rate)
         self.rtlsdr_source_0.set_sample_rate(self.samp_rate)
 
     def get_range_ppm_corr(self):
